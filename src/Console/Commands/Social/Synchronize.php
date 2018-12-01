@@ -30,6 +30,14 @@ class Synchronize extends Command
      */
     public function handle()
     {
+        try{
+
+            DB::table("connectors")->first();
+        }catch(\Exception $e)
+        {
+            return Logger::error("no connectors table");
+        }
+
         $services = config('services');
         $services = array_filter($services, function($item)
         {

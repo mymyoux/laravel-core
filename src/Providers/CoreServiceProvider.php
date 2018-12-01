@@ -33,7 +33,7 @@ class CoreServiceProvider extends ServiceProvider
                 Artisan::call('vendor:publish',['--tag'=>'myno']);
             }
         }
-        $this->loadMigrationsFrom(__DIR__.'../../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
         
     }
     /**

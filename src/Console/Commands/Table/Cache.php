@@ -512,6 +512,11 @@ class Cache extends Command
             }
             //id 
 
+            if(!isset($structure[$file->table]))
+            {
+                Logger::warn('no table '.$file->table);
+                continue;
+            }
             $table_structure = $structure[$file->table];
 
 
