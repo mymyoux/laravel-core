@@ -1,0 +1,42 @@
+{
+    "name": "myno/laravel",
+    "description": "laravel core package",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "mymyoux",
+            "email": "mymyoux@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Core\\": "src"
+        },
+        "files":[
+            "src/Util/Initialize.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "doctrine\/annotations": "^1.6",
+        "doctrine\/dbal": "^2.8"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "Core\\Scripts::postInstall"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Core\\Providers\\CoreServiceProvider",
+                "Core\\Providers\\ConsoleSupportServiceProvider"
+            ],
+            "aliases": {
+                "Api": "Core\\Facades\\Api",
+                "Logger": "Core\\Facades\\Logger"
+            }
+        }
+    }
+}

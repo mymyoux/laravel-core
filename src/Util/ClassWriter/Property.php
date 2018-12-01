@@ -1,0 +1,90 @@
+<?php 
+namespace Core\Util\ClassWriter;
+
+class Property
+{
+	protected $name;
+	protected $visibility;
+	protected $_isStatic;
+	protected $value;
+	protected $doc;
+	public function __construct($name, $visibility, $isStatic, $value, $doc)
+	{
+		$this->name = $name;
+		$this->visibility = $visibility;
+		$this->_isStatic = $isStatic;
+		$this->value = $value;
+		$this->doc = $doc;
+	}
+	public function getName()
+	{
+		return $this->name;
+	}
+	public function getVisibility()
+	{
+		return $this->visibility;
+	}
+	public function hasValue()
+	{
+		return isset($this->value);
+	}
+	public function getValue()
+	{
+		return $this->value;
+	}
+	public function hasVisibility()
+	{
+		return isset($this->visibility);
+	}
+	public function isStatic()
+	{
+		return $this->_isStatic;
+	}
+	public function hasDoc()
+	{
+		return isset($this->doc);
+	}
+	public function getDoc($tab = NULL)
+	{
+		if(isset($tab))
+		{
+			return preg_replace("/^ *\t*/m",$tab, $this->doc);
+		}
+		return $this->doc;
+	}
+	public function getEscapedValue()
+	{
+		if(is_array($this->value))
+		{
+			return join("\n\t",explode("\n",var_export($this->value, True)));
+		}
+		if(is_bool($this->value))
+		{
+			return $this->value?"true":"false";
+		}
+		if(!is_string($this->value))
+		{
+			return $this->value;
+		}
+		if($this->value == "NULL")
+		{
+			return $this->value;
+		}
+		
+		if(strtolower($this->value) == "true" || strtolower($this->value) == "false")
+		{
+			return $this->value;
+		}
+		if(is_numeric($this->value))
+		{
+			return $this->value;
+		}
+		if(mb_substr(0, 1) != "'" && mb_substr(0, 1)!='"')
+		{
+			return "'".str_replace('\'', '\\\'', $this->value)."'";
+		}
+	}
+
+}
+
+
