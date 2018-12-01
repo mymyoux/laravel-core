@@ -16,10 +16,10 @@ if (!function_exists('core_path'))
 {
     function core_path($path = NULL)
 	{
-
+       $core = mb_substr(\Core\Util\ModuleHelper::getModulePath('Core'),0, -1);
         if(isset($path))
-            return base_path(join_paths('app_core',$path));
-        return base_path('app_core');
+            return join_paths($core,$path);
+        return $core;
 	}
 }
 if (!function_exists('class_use_trait')) 
