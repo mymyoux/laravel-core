@@ -303,6 +303,15 @@ class Api
         $annotationReader::addGlobalIgnoredName('success');
 
         $paths = array_map(function($item){return base_path($item['path']);}, ModuleHelper::getModulesFromComposer());
+        
+        $paths = array_filter($paths, function($item)
+        {
+            if(starts_with($item, base_path('bootstrap')))
+            {
+                return False;
+            }
+            return True;
+        });
         //$paths = config('api.modules');
         $folders = [];
          foreach($paths as $path)
@@ -379,6 +388,7 @@ class Api
                 if(!empty($classAnnotations) || !empty($methodAnnotations))
                 {
                     $path = strtolower(str_ireplace('\\','/',str_ireplace("controller", "", $className)))."/";
+                   
                     $middlewares = [];
 
 
@@ -407,6 +417,7 @@ class Api
                         $config->middlewares = ['Core\Http\Middleware\Api\ApiMiddleware'];
                         $config->path = $path.uncamel($methodName);
                         $config->route = $className.'@'.$methodName;
+                        // echo $reflectedClass->getFilename()." -> ".$config->route ."\n";
                         //method annotations
                         foreach($annotations as $annotation)
                         {

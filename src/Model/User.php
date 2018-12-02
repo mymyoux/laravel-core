@@ -37,6 +37,21 @@ class User extends \Core\Database\Eloquent\Model implements AuthenticatableContr
     {
         return $this->belongsToMany('Core\Model\Connector');
     }
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if(isset($model->uuidPrefix))
+            {
+                $short = $model->uuidPrefix;
+            }else
+            {
+                $short = mb_substr($model->getTable(), 0, 5);
+            }
+            $model->token = $short.'-'.generate_token();
+        });
+    }
     /**
      * test
      *
@@ -73,6 +88,9 @@ class User extends \Core\Database\Eloquent\Model implements AuthenticatableContr
     }
     public function hasRole($name)
     {
+        //default role
+        if($name == 'user')
+            return !$this->isGuest();
         foreach($this->roles as $role)
         {
             //admin have all rights
