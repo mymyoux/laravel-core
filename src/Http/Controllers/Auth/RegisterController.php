@@ -151,7 +151,7 @@ class RegisterController extends \Core\Http\Controllers\Controller
                 $data = @file_get_contents($user->avatar);
                 if($data !== False)
                 {
-                    Storage::put($name,$data);
+                    Storage::disk('public')->put($name,$data);
                     $user->avatar = $name;
                     $user->save();
                 }
