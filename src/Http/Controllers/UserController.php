@@ -34,6 +34,16 @@ class UserController extends Controller
         return !!$req->first();
     }
      /**
+     * @myno\Param(name="name", required=true)
+     */
+    public function usernameExists($name)
+    {
+        $req = User::where('name','=',$name);
+        if(Auth::check())
+            $req->where('id', '!=', Auth::id());
+        return !!$req->first();
+    }
+     /**
      * @myno\Role("user")
      * @myno\Param(name="email",  requirements="email")
      * @myno\Param(name="name")
