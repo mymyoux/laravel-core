@@ -13,7 +13,8 @@ use Storage;
 use Illuminate\Http\File;
 use Core\Exception\ApiException;
 use App;
-class RegisterController extends \Core\Http\Controllers\Controller
+use Illuminate\Auth\Events\Registered;
+class SignupController extends \Core\Http\Controllers\Controller
 {
     /**
      * Create a new controller instance.
@@ -109,7 +110,6 @@ class RegisterController extends \Core\Http\Controllers\Controller
             }
             throw $e;
         }
-        
         $user = $this->createUser($connector);
         return App::call('App\Http\Controllers\Auth\LoginController@manual', [$request]);
     }
@@ -145,17 +145,8 @@ class RegisterController extends \Core\Http\Controllers\Controller
                 }
             }
             $user->save();
-            if(isset($user->avatar) && starts_with($user->avatar, 'http'))
-            {
-                $name = 'public/avatars/'.$user->getKey().'-'.generate_token();
-                $data = @file_get_contents($user->avatar);
-                if($data !== False)
-                {
-                    Storage::disk('public')->put($name,$data);
-                    $user->avatar = $name;
-                    $user->save();
-                }
-            }
+            event(new Registered($user));
+          
             $connector->addToUser($user);
         });
 
