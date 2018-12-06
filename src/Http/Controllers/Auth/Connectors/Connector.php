@@ -5,6 +5,8 @@ use Core\Model\Connector as ConnectorModel;
 use App\User;
 use DB;
 use Carbon\Carbon;
+use Core\Events\ConnectorAdded;
+
 class Connector
 {
     protected $api;
@@ -49,7 +51,7 @@ class Connector
     }
     public function getConnectorData()
     {
-        return $this->rawuser();
+       return $this->rawuser();
     }
     public function isMultiple()
     {
@@ -78,6 +80,7 @@ class Connector
                 $data->$key = $rawdata->$key;
             }
         }
+        // dd(["data"=>$data, "rawdata"=>$rawdata, "key"=>$keys]);
         if(!$this->isMultiple())
         {
             DB::table('connector_user')
@@ -105,7 +108,20 @@ class Connector
         }
         $user->connectors()->attach($this->getKey(), (array)$data);
         $user_connector_id = DB::getPdo()->lastInsertId();
+
+
+
+
+        //TODO:attach name/avatar/firstname/lastname
+
+
+
+
+        event(new ConnectorAdded($this, $user));
+
         $columns = $this->getAdditionalColumns();
+
+
         //no additional data
         if(empty($columns))
             return;

@@ -14,6 +14,7 @@ use Illuminate\Http\File;
 use Core\Exception\ApiException;
 use App;
 use Illuminate\Auth\Events\Registered;
+
 class SignupController extends \Core\Http\Controllers\Controller
 {
     /**
@@ -49,6 +50,7 @@ class SignupController extends \Core\Http\Controllers\Controller
         if(isset($dbuser))
         {
             $connector->addToUser($dbuser);
+
             //TODO: redirect home
             $request->session()->flash('login.user_id', $dbuser->getKey());
             return redirect()->route('login.callback', ['api' => "session"]);
@@ -149,6 +151,7 @@ class SignupController extends \Core\Http\Controllers\Controller
           
             $connector->addToUser($user);
         });
+
 
         //TODO:event register
         return $user;

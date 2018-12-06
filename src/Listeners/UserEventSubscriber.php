@@ -33,21 +33,45 @@ class UserEventSubscriber
 
 
     }
+    protected function setAvatar($user, $avatar)
+    {
+        //remote url only for now
+        if(!starts_with($avatar, 'http')) 
+            return;
+        $name = 'avatars/'.$user->getKey().'-'.generate_token();
+        $data = @file_get_contents($avatar);
+        if($data !== False)
+        {
+            Storage::disk('public')->put($name,$data);
+            $user->avatar = $name;
+            $user->save();
+        }
+    }
     public function onUserSignup($event) {
         $user = $event->user;
         //retrieve avatar
-        if(isset($user->avatar) && starts_with($user->avatar, 'http'))
+        if(isset($user->avatar))
         {
-            $name = 'avatars/'.$user->getKey().'-'.generate_token();
-            $data = @file_get_contents($user->avatar);
-            if($data !== False)
-            {
-                Storage::disk('public')->put($name,$data);
-                $user->avatar = $name;
-                $user->save();
-            }
+            $this->setAvatar($user, $user->avatar);
         }
 
+    }
+    public function onConnectorAdded($event) {
+        $connector = $event->connector;
+        $user = $event->user;
+        
+        $apiuser = $connector->getConnectorData();
+
+        //retrieve avatar
+        if(!isset($user->avatar) && isset($apiuser->avatar))
+        {
+            $this->setAvatar($user, $apiuser->avatar);
+        }
+        if(!isset($user->name) && isset($apiuser->name))
+        {
+            $user->name = $apiuser->name;
+            $user->save();
+        }
     }
 
     public function subscribe($events)
@@ -65,6 +89,10 @@ class UserEventSubscriber
         $events->listen(
             'Illuminate\Auth\Events\Registered',
             $cls.'@onUserSignup'
+        );
+        $events->listen(
+            'Core\Events\ConnectorAdded',
+            $cls.'@onConnectorAdded'
         );
     }
 }

@@ -106,6 +106,8 @@ class LoginController extends \Core\Http\Controllers\Controller
         }else
         {
             $dbuser = $connector->getDBUser();
+            //TODO: Faire la difference entre trouve juste l'user par l'email ou juste l'user
+            dd($dbuser);
             //register
             if(!isset($dbuser))
             {
