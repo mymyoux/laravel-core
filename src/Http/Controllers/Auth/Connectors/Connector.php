@@ -158,8 +158,12 @@ class Connector
     {
         return join_paths(__DIR__, 'migrations',$this->api.'.php');
     }
-    public function getDBUser()
+    public function getDBUser($append_has_connector = False)
     {
+        $has_connector = False;
+        User::macro('hasConnector', function() use($has_connector) {
+            return $has_connector;
+         });
         $dbuser = NULL;
         $user = $this->user();
         if(isset($user->id))
@@ -170,19 +174,26 @@ class Connector
             ->where('connector_user.connector_id','=',$this->getKey())
             ->first();
             if(isset($dbuser))
-                return $dbuser;
+            {
+                $has_connector = True;
+            }
         }
         if(!isset($dbuser) && isset($user->email))
         {
+            $has_connector = False;
             $dbuser = User::select('users.*')
             ->join('connector_user','connector_user.user_id','=','users.id')
             ->where('connector_user.email','=',$user->email)->first();
-        
+            
+            
             if(!isset($dbuser))
             {
                 $dbuser = User::where('email','=',$user->email)->first();
             }
         }
+        if($append_has_connector)
+            $dbuser->has_connector = $has_connector;
+   
         return $dbuser;
     }
 }

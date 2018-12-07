@@ -44,9 +44,20 @@ class SignupController extends \Core\Http\Controllers\Controller
     public function callback($api, Request $request)
     {
         $this->configureSocialite($api);
-        $connector = Connector::get($api);
-        $user = $connector->user();
-        $dbuser = $connector->getDBUser();
+        try{
+            
+            $connector = Connector::get($api);
+            $user = $connector->user();
+            $dbuser = $connector->getDBUser();
+        }catch(\Exception $e)
+        {
+            $message = $e->getMessage();
+            if(empty($message))
+            {
+                $message = last(explode('\\', get_class($e)));
+            }
+            return redirect()->to(config('app.home_url').'?error='.$message.'#/login');
+        }
         if(isset($dbuser))
         {
             $connector->addToUser($dbuser);

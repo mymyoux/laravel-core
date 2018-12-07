@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\User;
 use Core\Api\Annotations as myno;
 use Core\Exception\ApiException;
+use Core\Events\ConnectorLogin;
+use Redirect;
 
 class LoginController extends \Core\Http\Controllers\Controller
 {
@@ -83,6 +85,7 @@ class LoginController extends \Core\Http\Controllers\Controller
     }
     public function callback($api, Request $request)
     {
+        
         if($api == 'session')
         {
             $user_id = session('login.user_id');
@@ -105,16 +108,36 @@ class LoginController extends \Core\Http\Controllers\Controller
 
         }else
         {
-            $dbuser = $connector->getDBUser();
+            try
+            {
+                $dbuser = $connector->getDBUser(True);
+
+            }catch(\Exception $e)
+            {
+                $message = $e->getMessage();
+                if(empty($message))
+                {
+                    $message = last(explode('\\', get_class($e)));
+                }
+                return redirect()->to(config('app.home_url').'?error='.$message.'#/login');
+            }
             //TODO: Faire la difference entre trouve juste l'user par l'email ou juste l'user
-            dd($dbuser);
             //register
             if(!isset($dbuser))
             {
                 $request->session()->flash($api.'.user', $connector->user());
                 return redirect()->route('signup.callback', ['api'=>$api]);
+            } 
+            if($dbuser && !$dbuser->has_connector)
+            {
+                unset($dbuser->has_connector);
+                $connector->addToUser($dbuser);
+            }else {
+                unset($dbuser->has_connector);
             }
             Auth::login($dbuser, true);
+            event(new ConnectorLogin($connector, $dbuser));
+
             //login with api
             return $this->onLogin();
         }
