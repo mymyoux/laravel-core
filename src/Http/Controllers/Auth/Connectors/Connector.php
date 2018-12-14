@@ -191,7 +191,7 @@ class Connector
                 $dbuser = User::where('email','=',$user->email)->first();
             }
         }
-        if($append_has_connector)
+        if($append_has_connector && $dbuser)
             $dbuser->has_connector = $has_connector;
    
         return $dbuser;

@@ -114,6 +114,7 @@ class LoginController extends \Core\Http\Controllers\Controller
 
             }catch(\Exception $e)
             {
+                // dd($e);
                 $message = $e->getMessage();
                 if(empty($message))
                 {
