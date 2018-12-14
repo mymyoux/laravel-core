@@ -7,11 +7,13 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\ Authenticatable;
 use Storage;
 use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Doc
  */
 class User extends \Core\Database\Eloquent\Model implements AuthenticatableContract
 {
+    use SoftDeletes;
     use Authorizable;
     use Notifiable;
     use Authenticatable;
